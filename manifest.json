@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "CyberSource TM — Evolved UI",
+  "version": "1.1.0",
+  "description": "Replaces the legacy CyberSource Transaction Manager UI with an advanced, granular filtering dashboard.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://ebc2test.cybersource.com/ebc2/app/TransactionManagement/*",
+        "https://ebc2.cybersource.com/ebc2/app/TransactionManagement/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["styles.css", "src/*.js"],
+      "matches": [
+        "https://ebc2test.cybersource.com/*",
+        "https://ebc2.cybersource.com/*"
+      ]
+    }
+  ]
+}
