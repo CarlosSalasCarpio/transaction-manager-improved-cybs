@@ -8,6 +8,9 @@ import { reload, syncControls } from "./app.js";
 import { mountShell } from "./shell.js";
 
 async function injectStyles(root) {
+  // Bookmarklet / standalone build: CSS is inlined on a global.
+  const inline = typeof window !== "undefined" && window.__CYBSX_INLINE_CSS__;
+  if (inline) { root.appendChild(el("style", {}, "")).textContent = inline; return; }
   try {
     if (typeof chrome !== "undefined" && chrome.runtime?.getURL) {
       const css = await fetch(chrome.runtime.getURL("styles.css")).then(r => r.text());
@@ -30,7 +33,7 @@ function mountOverlay() {
   return host;
 }
 
-function enablePlugin() {
+export function enablePlugin() {
   if (document.getElementById("cybs-evolved-host")) return;
   try { document.documentElement.style.setProperty("overflow", "hidden", "important"); } catch (e) {}
   const host = mountOverlay();
@@ -41,7 +44,7 @@ function enablePlugin() {
   addFloatingReenable(false);
 }
 
-function disablePlugin() {
+export function disablePlugin() {
   try { localStorage.setItem(PLUGIN_OFF_KEY, "1"); } catch (e) {}
   const host = document.getElementById("cybs-evolved-host");
   if (host) host.remove();
@@ -75,12 +78,16 @@ function addFloatingReenable(show) {
   (document.body || document.documentElement).appendChild(chip);
 }
 
-function init() {
+export function init() {
   let off = false;
   try { off = localStorage.getItem(PLUGIN_OFF_KEY) === "1"; } catch (e) {}
   if (off) { addFloatingReenable(true); return; }
   enablePlugin();
 }
 
-if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
-else init();
+/* Auto-boot only in the Chrome extension context. The bookmarklet
+   build imports these functions and starts itself explicitly. */
+if (typeof chrome !== "undefined" && chrome.runtime?.id) {
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
+  else init();
+}

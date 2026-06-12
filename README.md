@@ -48,7 +48,7 @@ src/
   state.js        Application state.
 ```
 
-## Install (Load unpacked)
+## Install — option A: Chrome extension (Load unpacked)
 
 1. Open `chrome://extensions`.
 2. Enable **Developer mode** (top right).
@@ -60,6 +60,39 @@ The extension only runs on:
 
 - `https://ebc2test.cybersource.com/ebc2/app/TransactionManagement/*`
 - `https://ebc2.cybersource.com/ebc2/app/TransactionManagement/*`
+
+## Install — option B: Bookmarklet (no extension required)
+
+If Chrome extensions are restricted by policy, use the self-contained
+bookmarklet build instead. Everything (JS + CSS) is inlined into a single
+`javascript:` bookmark — no external resources are loaded, so it works under a
+strict Content-Security-Policy. The live data still comes from the page's own
+session (`POST /ebc2/tss/v2/searches`).
+
+1. Open `dist/bookmarklet.txt` and copy the entire contents (it starts with
+   `javascript:`).
+2. In Chrome, create a new bookmark (e.g. right-click the bookmarks bar →
+   **Add page…**), name it "Evolved TM", and paste the copied text as the URL.
+3. Open an EBC2 Transaction Management page, then click the bookmark. The Evolved
+   UI opens on top of the native page.
+
+Differences vs. the extension: you click the bookmark to launch it (it does not
+auto-run on page load).
+
+### Building the bookmarklet
+
+The artifacts in `dist/` are generated from `src/` with esbuild:
+
+```bash
+npm install
+npm run build:bookmarklet
+```
+
+This produces:
+
+- `dist/transaction-manager-improved-cybs.js` — self-contained IIFE bundle (also
+  pasteable into a DevTools Snippet / console).
+- `dist/bookmarklet.txt` — the same bundle as a ready-to-paste `javascript:` URL.
 
 ## Notes
 
